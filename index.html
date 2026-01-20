@@ -1,26 +1,58 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>@0x1B284004</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@0x1B284004</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
-<body class="relative w-screen h-screen overflow-hidden">
-  <video autoplay muted loop id="bgVideo" class="fixed w-full h-full object-cover z-0">
-      <source src="ressources/medias/bg.mp4" type="video/mp4">
-  </video>
-  <canvas id="threeCanvas" class="absolute top-0 left-0 w-full h-full z-10"></canvas>
-  <div class="absolute z-20 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 card">
-    <h1>@0x1B284004</h1>
-    <div class="flex gap-4 mt-4">
-      <a href="#"><img src="ressources/icons/discord.png" /></a>
-      <a href="#"><img src="ressources/icons/github.png" /></a>
-      <a href="#"><img src="ressources/icons/youtube.png" /></a>
+<body>
+    <video id="bg-video" autoplay muted loop playsinline>
+        <source src="ressources/medias/bg.mp4" type="video/mp4">
+    </video>
+    <canvas id="three-canvas"></canvas>
+    <div class="audio-visualizer">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
     </div>
-  </div>
-  <script type="module" src="script.js"></script>
+    <div class="content-card">
+        <h1 class="username" id="typing-text"></h1>
+        <div class="social-links">
+            <a href="https://discord.com" target="_blank" class="social-btn">
+                <img src="ressources/icons/discord.png" alt="Discord">
+            </a>
+            <a href="https://github.com/0x1B284004" target="_blank" class="social-btn">
+                <img src="ressources/icons/github.png" alt="GitHub">
+            </a>
+            <a href="https://youtube.com" target="_blank" class="social-btn">
+                <img src="ressources/icons/youtube.png" alt="YouTube">
+            </a>
+        </div>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
