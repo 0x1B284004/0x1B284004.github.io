@@ -1,68 +1,26 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>0x1B284004</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    body {
-      background: #0b0b0b;
-      color: #fff;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .card {
-      background: #111;
-      border: 1px solid #222;
-      padding: 30px 40px;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 0 40px rgba(0,0,0,0.6);
-    }
-
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    p {
-      opacity: 0.7;
-      margin-bottom: 20px;
-    }
-
-    a {
-      display: block;
-      margin: 8px 0;
-      padding: 10px;
-      border-radius: 8px;
-      background: #1a1a1a;
-      color: white;
-      text-decoration: none;
-      transition: 0.2s;
-    }
-
-    a:hover {
-      background: #2a2a2a;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>@0x1B284004</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.min.js"></script>
 </head>
-<body>
-
-  <div class="card">
+<body class="relative w-screen h-screen overflow-hidden">
+  <video autoplay muted loop id="bgVideo" class="fixed w-full h-full object-cover z-0">
+      <source src="ressources/medias/bg.mp4" type="video/mp4">
+  </video>
+  <canvas id="threeCanvas" class="absolute top-0 left-0 w-full h-full z-10"></canvas>
+  <div class="absolute z-20 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 card">
     <h1>@0x1B284004</h1>
-
+    <div class="flex gap-4 mt-4">
+      <a href="#"><img src="ressources/icons/discord.png" /></a>
+      <a href="#"><img src="ressources/icons/github.png" /></a>
+      <a href="#"><img src="ressources/icons/youtube.png" /></a>
+    </div>
   </div>
-
+  <script type="module" src="script.js"></script>
 </body>
 </html>
