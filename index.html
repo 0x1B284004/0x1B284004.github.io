@@ -5,54 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@0x1B284004</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
     <video id="bg-video" autoplay muted loop playsinline>
         <source src="ressources/medias/bg.mp4" type="video/mp4">
     </video>
-    <canvas id="three-canvas"></canvas>
-    <div class="audio-visualizer">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-    </div>
+    <audio id="bg-music" loop>
+        <source src="ressources/medias/music.mp3" type="audio/mpeg">
+    </audio>
+    <button id="music-toggle" class="music-btn">
+        <span id="music-icon">🔇</span>
+    </button>
     <div class="content-card">
         <h1 class="username" id="typing-text"></h1>
-        <div class="social-links">
-            <a href="https://discord.com" target="_blank" class="social-btn">
-                <img src="ressources/icons/discord.png" alt="Discord">
-            </a>
-            <a href="https://github.com/0x1B284004" target="_blank" class="social-btn">
-                <img src="ressources/icons/github.png" alt="GitHub">
-            </a>
-            <a href="https://youtube.com" target="_blank" class="social-btn">
-                <img src="ressources/icons/youtube.png" alt="YouTube">
-            </a>
-        </div>
     </div>
+    <div class="social-icons-bg">
+        <a href="https://discord.gg/" target="_blank" class="icon-link" data-platform="discord">
+            <img src="ressources/icons/discord.png" alt="Discord">
+        </a>
+        <a href="https://github.com/0x1B284004" target="_blank" class="icon-link" data-platform="github">
+            <img src="ressources/icons/github.png" alt="GitHub">
+        </a>
+        <a href="https://youtube.com/" target="_blank" class="icon-link" data-platform="youtube">
+            <img src="ressources/icons/youtube.png" alt="YouTube">
+        </a>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
