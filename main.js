@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js';
 
 document.body.addEventListener('mousemove', (e) => {
   document.body.style.setProperty('--cursorX', `${e.clientX}px`);
