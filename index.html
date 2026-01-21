@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@0x1B284004</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
     <video id="bg-video" autoplay muted loop playsinline>
@@ -13,11 +14,15 @@
     <audio id="bg-music" loop>
         <source src="ressources/medias/music.mp3" type="audio/mpeg">
     </audio>
-    <button id="music-toggle" class="music-btn">
-        <span id="music-icon">X</span>
-    </button>
+    <canvas id="webgl-canvas"></canvas>
+    <div id="audio-visualizer">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+    </div>
     <div class="left-panel">
         <h1 class="username" id="typing-text"></h1>
+        
         <div class="social-icons-column">
             <a href="https://discord.gg/" target="_blank" class="icon-link">
                 <img src="ressources/icons/discord.png" alt="Discord">
@@ -30,6 +35,7 @@
             </a>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>

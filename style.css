@@ -9,7 +9,6 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    cursor: url('ressources/medias/cursor.png'), auto !important;
 }
 
 body {
@@ -19,13 +18,25 @@ body {
     height: 100vh;
     background: #000;
     position: relative;
+    cursor: none !important;
+}
+body::after {
+    content: '';
+    position: fixed;
+    top: var(--cursorY, 0);
+    left: var(--cursorX, 0);
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%, -50%);
 }
 
-body *, body *:hover {
-    cursor: url('ressources/medias/cursor.png'), auto !important;
+button, input, a, [type="button"], [type="submit"], [role="button"], canvas {
+    cursor: none !important;
 }
-
-/* Background Video */
 #bg-video {
     position: fixed;
     top: 50%;
@@ -89,6 +100,7 @@ body *, body *:hover {
     width: 500px;
 }
 
+
 .username {
     font-size: 2.5rem;
     color: #ff6b00;
@@ -103,7 +115,6 @@ body *, body *:hover {
     color: #aaa;
     letter-spacing: 1px;
 }
-
 .social-icons-bg {
     position: fixed;
     bottom: 40px;
@@ -136,6 +147,17 @@ body *, body *:hover {
     transform: scale(1.05);
 }
 @media (max-width: 768px) {
+    #audio-visualizer {
+        top: 20px;
+        right: 20px;
+        gap: 8px;
+    }
+
+    .circle {
+        width: 12px;
+        height: 12px;
+    }
+
     .left-panel {
         top: 20px;
         left: 20px;
@@ -153,17 +175,18 @@ body *, body *:hover {
         width: 40px;
         height: 40px;
     }
-
-    .music-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 24px;
-        top: 20px;
-        right: 20px;
-    }
 }
 
 @media (max-width: 480px) {
+    #audio-visualizer {
+        gap: 6px;
+    }
+
+    .circle {
+        width: 10px;
+        height: 10px;
+    }
+
     .left-panel {
         top: 15px;
         left: 15px;
