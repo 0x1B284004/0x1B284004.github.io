@@ -1,207 +1,233 @@
 @font-face {
-    font-family: 'Terminus';
-    src: url('ressources/font/Terminus.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'IBMPlexMono';
+  src: url('assets/font/IBMPlexMono-SemiBold.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Montserrat-BlackItalic';
+  src: url('assets/font/Montserrat-BlackItalic.ttf') format('truetype');
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+}
+
+:root {
+  --bg: #000;
+  --fg: #fff;
+  --accent: #d3d3d3;
+  --font: 'IBMPlexMono', monospace;
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, button, a, input, [type="button"], [type="submit"], [role="button"], #audio-visualizer, #audio-visualizer * {
+  cursor: none !important;
 }
 
 body {
-    font-family: 'Terminus', monospace;
-    overflow: hidden;
-    width: 100vw;
-    height: 100vh;
-    background: #000;
-    position: relative;
-    cursor: none !important;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  overflow: hidden;
+  position: relative;
 }
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(45deg, #2c2a17, #FFCC57, #928339);
+  background-size: 200% 200%;
+  animation: gradientShift 10s ease infinite;
+  z-index: -2;
+  opacity: 0.3;
+  will-change: background-position;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 body::after {
-    content: '';
-    position: fixed;
-    top: var(--cursorY, 0);
-    left: var(--cursorX, 0);
-    width: 10px;
-    height: 10px;
-    background: #fff;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 10000;
-    transform: translate(-50%, -50%);
+  content: '';
+  position: fixed;
+  top: var(--cursorY, 0);
+  left: var(--cursorX, 0);
+  width: 8px;
+  height: 8px;
+  background: #d4d4d4;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transition: top 0.05s ease, left 0.05s ease;
 }
 
-button, input, a, [type="button"], [type="submit"], [role="button"], canvas {
-    cursor: none !important;
-}
-#bg-video {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    transform: translate(-50%, -50%);
-    z-index: 1;
-    opacity: 0.4;
-    object-fit: cover;
-}
-.music-btn {
-    position: fixed;
-    top: 30px;
-    right: 30px;
-    z-index: 1000;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: rgba(20, 20, 20, 0.85);
-    backdrop-filter: blur(20px);
-    border: 2px solid rgba(255, 107, 0, 0.4);
-    color: #ff6b00;
-    font-size: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    box-shadow: 0 0 30px rgba(255, 107, 0, 0.3);
+canvas#webgl-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  display: none;
 }
 
-.music-btn:hover {
-    transform: scale(1.1);
-    border-color: #ff6b00;
-    box-shadow: 0 0 40px rgba(255, 107, 0, 0.6);
-    background: rgba(255, 107, 0, 0.1);
+.bar {
+  background: var(--accent);
+  border-radius: 20px;
 }
 
-.music-btn:active {
-    transform: scale(0.95);
+.bar.horizontal {
+  width: 200px;
+  height: 6px;
+  animation: loadWidth 2.5s forwards;
 }
 
-.content-card {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 100;
-    background: rgba(20, 20, 20, 0.85);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 107, 0, 0.3);
-    border-radius: 16px;
-    padding: 50px 60px;
-    text-align: center;
-    box-shadow: 0 0 60px rgba(255, 107, 0, 0.4),
-                0 0 100px rgba(255, 107, 0, 0.2),
-                inset 0 0 40px rgba(255, 107, 0, 0.05);
-    max-width: 90vw;
-    width: 500px;
+.bar.vertical {
+  width: 6px;
+  height: 80px;
+  animation: loadHeight 2.5s forwards;
 }
 
-
-.username {
-    font-size: 2.5rem;
-    color: #ff6b00;
-    margin-bottom: 10px;
-    text-shadow: 0 0 20px rgba(255, 107, 0, 0.8),
-                 0 0 40px rgba(255, 107, 0, 0.5);
-    letter-spacing: 2px;
+@keyframes loadWidth {
+  from { width: 0; } to { width: 200px; }
+}
+@keyframes loadHeight {
+  from { height: 0; } to { height: 80px; }
 }
 
-.subtitle {
-    font-size: 1rem;
-    color: #aaa;
-    letter-spacing: 1px;
-}
-.social-icons-bg {
-    position: fixed;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 40px;
-    z-index: 50;
+@keyframes fadeOut {
+  to { opacity: 0; }
 }
 
-.icon-link {
-    display: block;
-    width: 50px;
-    height: 50px;
-    transition: all 0.3s ease;
+.container {
+  position: absolute;
+  top: 0.5rem;
+  right: 2rem;
+  z-index: 2;
+  text-align: right;
+  max-width: 400px;
 }
 
-.icon-link img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: all 0.3s ease;
+h1 {
+  font-family: 'Montserrat-BlackItalic', sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 5rem;
+  margin-bottom: 0.1rem;
+  margin-top: 0.01rem;
+  min-height: 1rem;
+  color: #FFCC57;
+  position: relative;
+  transition: color 0.3s;
 }
 
-.icon-link:hover {
-    transform: scale(1.15);
+h1:before {
+  content: '';
+  position: absolute;
+  bottom: 15px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: #ffffff;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.55, 0, 0.1, 1);
 }
 
-.icon-link:active {
-    transform: scale(1.05);
-}
-@media (max-width: 768px) {
-    #audio-visualizer {
-        top: 20px;
-        right: 20px;
-        gap: 8px;
-    }
-
-    .circle {
-        width: 12px;
-        height: 12px;
-    }
-
-    .left-panel {
-        top: 20px;
-        left: 20px;
-    }
-
-    .username {
-        font-size: 1.5rem;
-    }
-
-    .social-icons-column {
-        gap: 12px;
-    }
-
-    .icon-link {
-        width: 40px;
-        height: 40px;
-    }
+h1:hover:before {
+  transform: scaleX(1);
+  transform-origin: left;
+  height: 1px;
 }
 
-@media (max-width: 480px) {
-    #audio-visualizer {
-        gap: 6px;
-    }
+h2 {
+  font-size: 1rem;
+  color: var(--accent);
+  margin-top: 0.1rem;
+}
 
-    .circle {
-        width: 10px;
-        height: 10px;
-    }
+.projects ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.001rem;
+}
 
-    .left-panel {
-        top: 15px;
-        left: 15px;
-    }
+.projects li {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
 
-    .username {
-        font-size: 1.2rem;
-    }
+.projects a {
+  color: var(--fg);
+  text-decoration: none;
+  position: relative;
+  transition: color 0.3s;
+}
 
-    .social-icons-column {
-        gap: 10px;
-    }
+.projects a:before {
+  content: '';
+  position: absolute;
+  bottom: -0.1px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: #FFCC57;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.55, 0, 0.1, 1);
+}
 
-    .icon-link {
-        width: 35px;
-        height: 35px;
-    }
+.projects a:hover:before {
+  transform: scaleX(1);
+  transform-origin: left;
+  height: 1px;
+}
+
+#audio-visualizer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+#audio-visualizer .circle {
+  width: 15px;
+  height: 15px;
+  min-width: 15px;
+  min-height: 15px;
+  max-width: 15px;
+  max-height: 15px;
+  aspect-ratio: 1/1;
+  background: #FFCC57;
+  border-radius: 50%;
+  margin-left: 10px;
+  transform: scale(0.5);
+  transform-origin: center;
+  transition: transform 0.1s;
+  box-sizing: border-box;
+}
+
+#audio-visualizer.paused .circle {
+  transform: scale(0.5);
+}
+
+@media (max-width: 600px) {
+  h1 { font-size: 1.2rem; }
+  h2 { font-size: 1rem; }
+  .projects li { font-size: 0.9rem; }
 }

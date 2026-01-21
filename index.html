@@ -1,41 +1,30 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@0x1B284004</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>0X1B</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <video id="bg-video" autoplay muted loop playsinline>
-        <source src="ressources/medias/bg.mp4" type="video/mp4">
-    </video>
-    <audio id="bg-music" loop>
-        <source src="ressources/medias/music.mp3" type="audio/mpeg">
-    </audio>
-    <canvas id="webgl-canvas"></canvas>
-    <div id="audio-visualizer">
-        <div class="circle"></div>
-        <div class="circle"></div>
-        <div class="circle"></div>
+  <div class="main-content visible">
+    <div class="container">
+      <h1 id="typewriter"></h1>
+      <nav class="projects">
+        <ul>
+          <li><a href="projects.html">MY PROJECTS</a></li>
+          <li><a href="about.html">ABOUT ME</a></li>
+          <li><a href="contacts.html">MY CONTACTS</a></li>
+          <li><a href="skills.html">SKILLS</a></li>
+        </ul>
+      </nav>
+      <div id="audio-visualizer"></div>
     </div>
-    <div class="left-panel">
-        <h1 class="username" id="typing-text"></h1>
-        
-        <div class="social-icons-column">
-            <a href="https://discord.gg/" target="_blank" class="icon-link">
-                <img src="ressources/icons/discord.png" alt="Discord">
-            </a>
-            <a href="https://github.com/0x1B284004" target="_blank" class="icon-link">
-                <img src="ressources/icons/github.png" alt="GitHub">
-            </a>
-            <a href="https://youtube.com/" target="_blank" class="icon-link">
-                <img src="ressources/icons/youtube.png" alt="YouTube">
-            </a>
-        </div>
+    <div id="page-content">
+      <canvas id="webgl-canvas"></canvas>
     </div>
+  </div>
 
-    <script src="script.js"></script>
+  <script type="module" src="main.js"></script>
 </body>
 </html>
