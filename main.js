@@ -161,39 +161,25 @@ function initTorus(){
     return;
   }
   canvas.style.display='block';
-  
-  // Configuration de la scène
   scene=new THREE.Scene();
   scene.fog=new THREE.Fog(0xd1d1d1,1,6);
-  
-  // Lumières
   scene.add(new THREE.AmbientLight(0xffffff,0.5));
   const dirLight=new THREE.DirectionalLight(0xffffff,0.5);
   dirLight.position.set(1,1,1);
   scene.add(dirLight);
-  
-  // Configuration de la caméra - CENTRÉ VERTICALEMENT ET HORIZONTALEMENT
   camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
   camera.position.set(0,0,1.9);
   camera.lookAt(0,0,0);
-  
-  // Renderer - Plein écran avec canvas positionné
   renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
-  
-  // Calculer les dimensions exactes
   const width = window.innerWidth;
   const height = window.innerHeight;
   
   renderer.setSize(width, height);
   renderer.setPixelRatio(window.devicePixelRatio);
-  
-  // S'assurer que le canvas est bien dimensionné
   canvas.width = width * window.devicePixelRatio;
   canvas.height = height * window.devicePixelRatio;
   canvas.style.width = width + 'px';
   canvas.style.height = height + 'px';
-  
-  // Création du torus knot - POSITIONNÉ AU CENTRE EXACT
   const geometry=new THREE.TorusKnotGeometry(0.6,0.18,160,24);
   const material=new THREE.MeshPhysicalMaterial({
     color:0xa3a3a3,
@@ -208,8 +194,6 @@ function initTorus(){
   torusKnot=new THREE.Mesh(geometry,material);
   torusKnot.position.set(0,0,0);
   scene.add(torusKnot);
-  
-  // Interaction souris
   let isMouseDown=false;
   let rotationAxis=new THREE.Vector3(1,1,0).normalize();
   
@@ -223,17 +207,11 @@ function initTorus(){
       rotationAxis.lerp(target,0.1);
     }
   });
-  
-  // Animation loop
   function animate(){
     requestAnimationFrame(animate);
-    
-    // Rotation
     const q=new THREE.Quaternion().setFromAxisAngle(rotationAxis,0.001);
     torusKnot.quaternion.multiply(q);
     if(!isMouseDown) rotationAxis.lerp(new THREE.Vector3(1,1,0).normalize(),0.02);
-    
-    // Animation audio
     if(isPlaying&&!isPaused){
       analyser.getByteFrequencyData(dataArray);
       const avg=dataArray.reduce((s,v)=>s+v,0)/bufferLength;
@@ -246,8 +224,6 @@ function initTorus(){
     renderer.render(scene,camera);
   }
   animate();
-  
-  // Responsive
   window.addEventListener('resize',()=>{
     const width = window.innerWidth;
     const height = window.innerHeight;
