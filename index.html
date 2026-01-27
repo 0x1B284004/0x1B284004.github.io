@@ -6,25 +6,45 @@
   <title>0X1B</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-section="home">
+  <!-- Canvas en dehors de page-content pour éviter le transform -->
+  <canvas id="webgl-canvas"></canvas>
+  
   <div class="main-content visible">
     <div class="container">
       <h1 id="typewriter"></h1>
       <nav class="projects">
         <ul>
-          <li><a href="projects.html">MY PROJECTS</a></li>
-          <li><a href="about.html">ABOUT ME</a></li>
-          <li><a href="contacts.html">MY CONTACTS</a></li>
-          <li><a href="skills.html">SKILLS</a></li>
+          <li><a href="#" data-section="projects">MY PROJECTS</a></li>
+          <li><a href="#" data-section="about">ABOUT ME</a></li>
+          <li><a href="#" data-section="contacts">MY CONTACTS</a></li>
+          <li><a href="#" data-section="skills">MY SKILLS</a></li>
+          <li><a href="#" data-section="tips">TIP ME</a></li>
         </ul>
       </nav>
       <div id="audio-visualizer"></div>
     </div>
+
     <div id="page-content">
-      <canvas id="webgl-canvas"></canvas>
+      <div id="section-home" class="section active">
+      </div>
+
+      <div id="section-projects" class="section">
+      </div>
+
+      <div id="section-about" class="section">
+      </div>
+
+      <div id="section-contacts" class="section">
+      </div>
+
+      <div id="section-skills" class="section">
+      </div>
+
+      <div id="section-tips" class="section">
+      </div>
     </div>
   </div>
-
   <script type="module" src="main.js"></script>
 </body>
 </html>

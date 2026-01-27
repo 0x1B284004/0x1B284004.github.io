@@ -1,35 +1,16 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js';
 
-document.body.addEventListener('mousemove', (e) => {
+let scene, torusKnot, analyser, audio, dataArray, isPaused = false, isPlaying = false;
+let camera, renderer;
+
+document.body.addEventListener('mousemove', e => {
   document.body.style.setProperty('--cursorX', `${e.clientX}px`);
   document.body.style.setProperty('--cursorY', `${e.clientY}px`);
 });
 
-const afterStyle = document.createElement('style');
-afterStyle.textContent = `
-  body, button, input, a, [type="button"], [type="submit"], [role="button"], canvas {
-    cursor: none !important;
-  }
-  body::after {
-    content: '';
-    position: fixed;
-    top: var(--cursorY, 0);
-    left: var(--cursorX, 0);
-    width: 8px;
-    height: 8px;
-    background: #d4d4d4;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 1000;
-    transition: top 0.05s ease, left 0.05s ease;
-  }
-`;
-document.head.appendChild(afterStyle);
-
 const typewriterText = "0X1B";
 const typewriterElement = document.getElementById('typewriter');
 let i = 0;
-
 function typeWriter() {
   if (i < typewriterText.length) {
     typewriterElement.textContent += typewriterText.charAt(i);
@@ -38,277 +19,251 @@ function typeWriter() {
   }
 }
 typeWriter();
+typewriterElement.addEventListener('click', () => changeSection('home'));
 
-function navigateWithFade(url) {
-  const normalizedUrl = url === '/' ? '/index.html' : url;
-  const pageContent = document.querySelector('#page-content');
-  if (!pageContent) {
-    window.location.href = normalizedUrl;
+function animateColor(colorObj, targetColor, duration) {
+  const startColor = colorObj.clone();
+  const endColor = new THREE.Color(targetColor);
+  const startTime = Date.now();
+  function update() {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = progress < 0.5 ? 2*progress*progress : 1-Math.pow(-2*progress+2,2)/2;
+    colorObj.lerpColors(startColor,endColor,eased);
+    if(progress<1) requestAnimationFrame(update);
+  }
+  update();
+}
+
+function animateCSSColor(property,startColor,endColor,duration){
+  const start={r:parseInt(startColor.slice(1,3),16),g:parseInt(startColor.slice(3,5),16),b:parseInt(startColor.slice(5,7),16)};
+  const end={r:parseInt(endColor.slice(1,3),16),g:parseInt(endColor.slice(3,5),16),b:parseInt(endColor.slice(5,7),16)};
+  const startTime=Date.now();
+  function update(){
+    const elapsed=Date.now()-startTime;
+    const progress=Math.min(elapsed/duration,1);
+    const eased=progress<0.5?2*progress*progress:1-Math.pow(-2*progress+2,2)/2;
+    const r=Math.round(start.r+(end.r-start.r)*eased);
+    const g=Math.round(start.g+(end.g-start.g)*eased);
+    const b=Math.round(start.b+(end.b-start.b)*eased);
+    document.documentElement.style.setProperty(property,`#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`);
+    if(progress<1) requestAnimationFrame(update);
+  }
+  update();
+}
+
+const sections={
+  home:{start:'#2c2a17',end:'#FFCC57',accent:'#FFCC57',h1:'#FFCC57',torusColor:0xa3a3a3,torusEmissive:0xffcc57,fog:0xd1d1d1},
+  contacts:{start:'#1a0a2e',end:'#9c27b0',accent:'#bb86fc',h1:'#bb86fc',torusColor:0x9c27b0,torusEmissive:0xbb86fc,fog:0x1a0a2e},
+  about:{start:'#1a0a0a',end:'#ff4444',accent:'#ff6b6b',h1:'#ff6b6b',torusColor:0xcc2222,torusEmissive:0xff6b6b,fog:0x1a0a0a},
+  skills:{start:'#1a0a2e',end:'#9d4edd',accent:'#c77dff',h1:'#c77dff',torusColor:0x7209b7,torusEmissive:0xc77dff,fog:0x1a0a2e},
+  projects:{start:'#0a1a2e',end:'#4a90e2',accent:'#64b5f6',h1:'#64b5f6',torusColor:0x2171c9,torusEmissive:0x64b5f6,fog:0x0a1a2e},
+  tips:{start:'#004b23',end:'#38ef7d',accent:'#57cc99',h1:'#57cc99',torusColor:0x007f5f,torusEmissive:0x57cc99,fog:0x004b23}
+};
+
+function changeSection(sectionName){
+  if(!sections[sectionName]) return;
+  const s=sections[sectionName];
+  document.body.dataset.section=sectionName;
+  const currentStart=getComputedStyle(document.documentElement).getPropertyValue('--gradient-start').trim();
+  const currentEnd=getComputedStyle(document.documentElement).getPropertyValue('--gradient-end').trim();
+  const currentAccent=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+  const currentUnderline=getComputedStyle(document.documentElement).getPropertyValue('--underline').trim();
+  animateCSSColor('--gradient-start',currentStart,s.start,1200);
+  animateCSSColor('--gradient-end',currentEnd,s.end,1200);
+  animateCSSColor('--accent',currentAccent,s.accent,1200);
+  animateCSSColor('--h1-color',currentAccent,s.h1,1200);
+  animateCSSColor('--underline',currentUnderline,s.accent,1200);
+  document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
+  document.getElementById(`section-${sectionName}`).classList.add('active');
+  document.querySelector('#page-content').classList.add('active');
+  if(torusKnot){
+    animateColor(torusKnot.material.color,s.torusColor,1200);
+    animateColor(torusKnot.material.emissive,s.torusEmissive,1200);
+    animateColor(scene.fog.color,s.fog,1200);
+  }
+}
+
+document.body.addEventListener('click',e=>{
+  const link=e.target.closest('.projects a');
+  if(link){e.preventDefault();changeSection(link.dataset.section);}
+});
+
+const audioContext=new(window.AudioContext||window.webkitAudioContext)();
+analyser=audioContext.createAnalyser();
+analyser.fftSize=256;
+const bufferLength=analyser.frequencyBinCount;
+dataArray=new Uint8Array(bufferLength);
+audio=new Audio('assets/audio/background.mp3');
+audio.loop=true;
+audio.volume=1;
+
+function fadeAudio(targetVolume,duration){
+  const startVolume=audio.volume;
+  const startTime=Date.now();
+  function updateVolume(){
+    const elapsed=Date.now()-startTime;
+    const progress=Math.min(elapsed/duration,1);
+    audio.volume=startVolume+(targetVolume-startVolume)*progress;
+    if(progress<1) requestAnimationFrame(updateVolume);
+  }
+  updateVolume();
+}
+
+const visualizer=document.getElementById('audio-visualizer');
+for(let i=0;i<3;i++){
+  const circle=document.createElement('div');
+  circle.classList.add('circle');
+  circle.style.right=`${i*30}px`;
+  visualizer.appendChild(circle);
+}
+
+let source=null,audioInitialized=false;
+document.addEventListener('click',e=>{
+  if(!audioInitialized&&!e.target.closest('#audio-visualizer')&&!e.target.closest('.projects a')){
+    if(audioContext.state==='suspended') audioContext.resume();
+    if(!source){source=audioContext.createMediaElementSource(audio);source.connect(analyser);analyser.connect(audioContext.destination);}
+    audio.play().then(()=>{isPlaying=true;isPaused=false;animateCircles();});
+    audioInitialized=true;
+  }
+});
+
+function animateCircles(){
+  const circles=document.querySelectorAll('.circle');
+  function loop(){
+    if(!isPaused&&isPlaying){
+      analyser.getByteFrequencyData(dataArray);
+      const avg=dataArray.reduce((s,v)=>s+v,0)/bufferLength;
+      const scale=0.5+(avg/255)*2.5;
+      circles.forEach((c,idx)=>c.style.transform=`scale(${scale*(1-idx*0.2)})`);
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+visualizer.addEventListener('click',()=>{
+  isPaused=!isPaused;
+  visualizer.classList.toggle('paused',isPaused);
+  if(isPaused){
+    fadeAudio(0,500);
+    setTimeout(()=>{audio.pause();document.querySelectorAll('.circle').forEach(c=>c.style.transform='scale(0.5)');},500);
+  }else{
+    audio.volume=0;
+    audio.play().then(()=>{fadeAudio(1,500);animateCircles();});
+  }
+});
+
+function initTorus(){
+  const canvas=document.getElementById('webgl-canvas');
+  if(!canvas){
+    console.error('Canvas element not found');
     return;
   }
-  pageContent.style.opacity = '0';
-  pageContent.addEventListener('transitionend', function onTransitionEnd() {
-    pageContent.removeEventListener('transitionend', onTransitionEnd);
-    fetch(normalizedUrl)
-      .then(response => {
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        return response.text();
-      })
-      .then(html => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const newContent = doc.querySelector('#page-content');
-        if (!newContent) {
-          window.location.href = normalizedUrl;
-          return;
-        }
-        pageContent.innerHTML = newContent.innerHTML;
-        history.pushState({}, '', url);
-        const canvas = document.getElementById('webgl-canvas');
-        if (canvas) {
-          const isIndex = url === '/' || url === '/index.html';
-          canvas.style.display = isIndex ? 'block' : 'none';
-          if (isIndex) {
-            initTorus();
-          }
-        }
-        setTimeout(() => {
-          pageContent.style.opacity = '1';
-        }, 50);
-      })
-      .catch(() => {
-        window.location.href = normalizedUrl;
-      });
-  }, { once: true });
-}
-
-typewriterElement.addEventListener('click', () => {
-  navigateWithFade('/index.html');
-});
-
-document.body.addEventListener('click', (e) => {
-  const link = e.target.closest('.projects a');
-  if (link) {
-    e.preventDefault();
-    const url = link.getAttribute('href');
-    navigateWithFade(url);
-  }
-});
-
-const audio = new Audio('assets/audio/background.mp3');
-audio.loop = true;
-audio.volume = 1;
-let isPlaying = false;
-let isPaused = false;
-
-const visualizer = document.getElementById('audio-visualizer');
-if (visualizer) {
-  for (let i = 0; i < 3; i++) {
-    const circle = document.createElement('div');
-    circle.classList.add('circle');
-    circle.style.right = `${i * 30}px`;
-    visualizer.appendChild(circle);
-  }
-}
-
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-const analyser = audioContext.createAnalyser();
-analyser.fftSize = 256;
-const bufferLength = analyser.frequencyBinCount;
-const dataArray = new Uint8Array(bufferLength);
-let source = null;
-
-let currentScales = [0.5, 0.5, 0.5];
-
-document.addEventListener('click', () => {
-  if (!isPlaying && !isPaused && visualizer) {
-    if (audioContext.state === 'suspended') audioContext.resume();
-    source = audioContext.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(audioContext.destination);
-    audio.play().then(() => {
-      isPlaying = true;
-      animateCircles();
-    });
-  }
-});
-
-function animateCircles() {
-  if (!visualizer) return;
-  clearInterval(visualizer._waveInterval);
-  visualizer._waveInterval = setInterval(() => {
-    if (!isPaused) {
-      analyser.getByteFrequencyData(dataArray);
-      const avg = dataArray.reduce((sum, val) => sum + val, 0) / bufferLength;
-      const scale = 0.5 + (avg / 255) * 2.5;
-      document.querySelectorAll('.circle').forEach((circle, index) => {
-        currentScales[index] = scale * (1 - index * 0.2);
-        circle.style.transform = `scale(${currentScales[index]})`;
-      });
-    }
-  }, 10);
-}
-
-visualizer.addEventListener('click', () => {
-  if (!visualizer) return;
-  isPaused = !isPaused;
-  visualizer.classList.toggle('paused', isPaused);
-
-  const fadeDuration = 800;
-  const steps = 40;
-  const stepTime = fadeDuration / steps;
-  let currentStep = 0;
-
-  const startVol = audio.volume;
-  const endVol = isPaused ? 0 : 1;
-  const volStep = (endVol - startVol) / steps;
-
-  const startScales = [...currentScales];
-  const endScales = isPaused ? [0.5, 0.5, 0.5] : [0.5, 0.5, 0.5];
-  const scaleSteps = startScales.map((start, i) => (endScales[i] - start) / steps);
-
-  clearInterval(visualizer._fadeInterval);
-  visualizer._fadeInterval = setInterval(() => {
-    currentStep++;
-    audio.volume = Math.min(Math.max(startVol + volStep * currentStep, 0), 1);
-    currentScales = startScales.map((start, i) => start + scaleSteps[i] * currentStep);
-    document.querySelectorAll('.circle').forEach((circle, index) => {
-      if (!isPaused) {
-        analyser.getByteFrequencyData(dataArray);
-        const avg = dataArray.reduce((sum, val) => sum + val, 0) / bufferLength;
-        const pulseScale = 0.5 + (avg / 255) * 2.5;
-        circle.style.transform = `scale(${currentScales[index] + (pulseScale - 0.5)})`;
-      } else {
-        circle.style.transform = `scale(${currentScales[index]})`;
-      }
-    });
-    if (currentStep >= steps) {
-      clearInterval(visualizer._fadeInterval);
-      if (isPaused) {
-        clearInterval(visualizer._waveInterval);
-        document.querySelectorAll('.circle').forEach(circle => {
-          circle.style.transform = `scale(0.5)`;
-        });
-        audio.pause();
-      } else {
-        audio.play().then(() => {
-          animateCircles();
-        });
-      }
-    }
-  }, stepTime);
-});
-
-let currentTorusScale = 0.8;
-function initTorus() {
-  const canvas = document.getElementById('webgl-canvas');
-  if (!canvas) return;
-  canvas.style.display = 'block';
-
-  const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0xd1d1d1, 1, 4);
-
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-  scene.add(ambientLight);
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-  directionalLight.position.set(1, 1, 1);
-  scene.add(directionalLight);
-
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 1.6;
-
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  canvas.style.display='block';
+  
+  // Configuration de la scène
+  scene=new THREE.Scene();
+  scene.fog=new THREE.Fog(0xd1d1d1,1,6);
+  
+  // Lumières
+  scene.add(new THREE.AmbientLight(0xffffff,0.5));
+  const dirLight=new THREE.DirectionalLight(0xffffff,0.5);
+  dirLight.position.set(1,1,1);
+  scene.add(dirLight);
+  
+  // Configuration de la caméra - CENTRÉ VERTICALEMENT ET HORIZONTALEMENT
+  camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+  camera.position.set(0,0,1.9);
+  camera.lookAt(0,0,0);
+  
+  // Renderer - Plein écran avec canvas positionné
+  renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  
+  // Calculer les dimensions exactes
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  
+  renderer.setSize(width, height);
   renderer.setPixelRatio(window.devicePixelRatio);
-
-  const geometry = new THREE.TorusKnotGeometry(0.6, 0.18, 160, 24);
-  const material = new THREE.MeshPhysicalMaterial({
-    color: 0xa3a3a3,
-    emissive: 0xffcc57,
-    roughness: 0,
-    metalness: 1,
-    ior: 2.333,
-    reflectivity: 1,
-    iridescence: 0.186,
-    iridescenceIOR: 2.333,
-    sheen: 1,
-    sheenRoughness: 1,
-    sheenColor: 0xffffff,
-    clearcoat: 1,
-    specularIntensity: 1,
-    specularColor: 0xffffff,
-    wireframe: true,
-    fog: true,
-    transparent: true,
-    opacity: 1,
-    depthTest: true,
-    depthWrite: true,
-    alphaTest: 1,
-    side: THREE.FrontSide
+  
+  // S'assurer que le canvas est bien dimensionné
+  canvas.width = width * window.devicePixelRatio;
+  canvas.height = height * window.devicePixelRatio;
+  canvas.style.width = width + 'px';
+  canvas.style.height = height + 'px';
+  
+  // Création du torus knot - POSITIONNÉ AU CENTRE EXACT
+  const geometry=new THREE.TorusKnotGeometry(0.6,0.18,160,24);
+  const material=new THREE.MeshPhysicalMaterial({
+    color:0xa3a3a3,
+    emissive:0xffcc57,
+    roughness:0,
+    metalness:1,
+    wireframe:true,
+    transparent:true,
+    opacity:0.9,
+    side:THREE.DoubleSide
   });
-  const torusKnot = new THREE.Mesh(geometry, material);
+  torusKnot=new THREE.Mesh(geometry,material);
+  torusKnot.position.set(0,0,0);
   scene.add(torusKnot);
-
-  let isMouseDown = false;
-  let rotationAxis = new THREE.Vector3(1, 1, 0).normalize();
-  const rotationSpeed = 0.001;
-
-  function animateTorusToMusic() {
-    if (!isPaused && isPlaying) {
-      analyser.getByteFrequencyData(dataArray);
-      const avg = dataArray.reduce((sum, val) => sum + val, 0) / bufferLength;
-      const targetScale = 0.78 + (avg / 255) * 0.04;
-      currentTorusScale = THREE.MathUtils.lerp(currentTorusScale, targetScale, 0.05);
-      torusKnot.scale.set(currentTorusScale, currentTorusScale, currentTorusScale);
-    } else {
-      currentTorusScale = THREE.MathUtils.lerp(currentTorusScale, 0.8, 0.05);
-      torusKnot.scale.set(currentTorusScale, currentTorusScale, currentTorusScale);
-    }
-  }
-
-  document.addEventListener('mousedown', () => { isMouseDown = true; });
-  document.addEventListener('mouseup', () => { isMouseDown = false; });
-
-  document.addEventListener('mousemove', (e) => {
-    if (isMouseDown) {
-      const dx = (e.clientX - window.innerWidth / 2) / window.innerWidth;
-      const dy = (e.clientY - window.innerHeight / 2) / window.innerHeight;
-      const targetAxis = new THREE.Vector3(dy * 2, dx * 2, 0).normalize();
-      rotationAxis.lerp(targetAxis, 0.1);
+  
+  // Interaction souris
+  let isMouseDown=false;
+  let rotationAxis=new THREE.Vector3(1,1,0).normalize();
+  
+  document.addEventListener('mousedown',()=>isMouseDown=true);
+  document.addEventListener('mouseup',()=>isMouseDown=false);
+  document.addEventListener('mousemove',e=>{
+    if(isMouseDown){
+      const dx=(e.clientX-window.innerWidth/2)/window.innerWidth;
+      const dy=(e.clientY-window.innerHeight/2)/window.innerHeight;
+      const target=new THREE.Vector3(dy*2,dx*2,0).normalize();
+      rotationAxis.lerp(target,0.1);
     }
   });
-
-  function animate() {
+  
+  // Animation loop
+  function animate(){
     requestAnimationFrame(animate);
-    const quaternion = new THREE.Quaternion();
-    quaternion.setFromAxisAngle(rotationAxis, rotationSpeed);
-    torusKnot.quaternion.multiply(quaternion);
-    if (!isMouseDown) {
-      rotationAxis.lerp(new THREE.Vector3(1, 1, 0).normalize(), 0.05);
+    
+    // Rotation
+    const q=new THREE.Quaternion().setFromAxisAngle(rotationAxis,0.001);
+    torusKnot.quaternion.multiply(q);
+    if(!isMouseDown) rotationAxis.lerp(new THREE.Vector3(1,1,0).normalize(),0.02);
+    
+    // Animation audio
+    if(isPlaying&&!isPaused){
+      analyser.getByteFrequencyData(dataArray);
+      const avg=dataArray.reduce((s,v)=>s+v,0)/bufferLength;
+      const targetScale=0.78+(avg/255)*0.04;
+      torusKnot.scale.setScalar(THREE.MathUtils.lerp(torusKnot.scale.x,targetScale,0.05));
+    }else{
+      torusKnot.scale.setScalar(THREE.MathUtils.lerp(torusKnot.scale.x,0.8,0.05));
     }
-    animateTorusToMusic();
-    renderer.render(scene, camera);
+    
+    renderer.render(scene,camera);
   }
   animate();
-
-  window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
+  
+  // Responsive
+  window.addEventListener('resize',()=>{
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    
+    camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(width, height);
+    
+    canvas.width = width * window.devicePixelRatio;
+    canvas.height = height * window.devicePixelRatio;
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
   });
 }
 
-window.addEventListener('load', () => {
-  const isIndex = window.location.pathname === '/' || window.location.pathname === '/index.html';
-  if (isIndex) {
-    const canvas = document.getElementById('webgl-canvas');
-    if (canvas) {
-      canvas.style.display = 'block';
-      initTorus();
-    }
-  }
-});
-
-window.addEventListener('popstate', () => {
-  navigateWithFade(window.location.pathname);
+window.addEventListener('load',()=>{
+  initTorus();
+  changeSection('home');
 });
